@@ -8,5 +8,6 @@
     <color name="cardview_border_color">#3F51B5</color>
     <color name="bottom_icon_color">#FF00FF</color>
     <color name="bottom_text_color">#FF00FF</color>
+    <color name="arrow_img_btn">#FF00FF</color>
 
 </resources>

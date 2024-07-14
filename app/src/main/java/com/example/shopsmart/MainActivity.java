@@ -7,7 +7,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.core.content.ContextCompat;
 
 import com.example.shopsmart.databinding.ActivityMainBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,22 +35,21 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // Set up initial fragment
         replaceFragment(new HomeFragment());
 
+        // Handle bottom navigation view item selection
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
-                case R.id.home:
-                    replaceFragment(new HomeFragment());
-                    break;
                 case R.id.favourite:
                     replaceFragment(new FavouriteFragment());
-                    break;
+                    return true;
                 case R.id.more:
                     replaceFragment(new MenuFragment());
-                    break;
-                // Add cases for other tabs as needed
+                    return true;
+                default:
+                    return false;
             }
-            return true;
         });
 
         // Set up the bottom navigation menu
@@ -62,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
+        fragmentTransaction.addToBackStack(null); // Add fragment to back stack
         fragmentTransaction.commit();
     }
 
@@ -72,9 +71,6 @@ public class MainActivity extends AppCompatActivity {
         List<BottomTabItemType> bottomTabList = getBottomTabItemTypes();
         for (BottomTabItemType tab : bottomTabList) {
             switch (tab) {
-                case HOME:
-                    binding.bottomNavigationView.getMenu().add(0, R.id.home, 0, "Home").setIcon(R.drawable.img_home);
-                    break;
                 case FAVOURITE:
                     binding.bottomNavigationView.getMenu().add(0, R.id.favourite, 0, "Favourite").setIcon(R.drawable.img_home_bottom_tab_favorite);
                     break;
@@ -88,10 +84,18 @@ public class MainActivity extends AppCompatActivity {
 
     public List<BottomTabItemType> getBottomTabItemTypes() {
         List<BottomTabItemType> bottomTabList = new ArrayList<>();
-        bottomTabList.add(BottomTabItemType.HOME);
         bottomTabList.add(BottomTabItemType.FAVOURITE);
         bottomTabList.add(BottomTabItemType.MORE);
         // Add more items as needed
         return bottomTabList;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

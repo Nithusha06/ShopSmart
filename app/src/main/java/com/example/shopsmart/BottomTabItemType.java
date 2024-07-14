@@ -1,7 +1,7 @@
 package com.example.shopsmart;
 
 public enum BottomTabItemType {
-    HOME,
+//    HOME,
     FAVOURITE,
     MORE;
 }
