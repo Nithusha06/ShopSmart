@@ -4,13 +4,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.example.shopsmart.adapter.DrawerAdapter;
+import com.example.shopsmart.databinding.ActivityMainBinding;
+import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import androidx.core.view.GravityCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.example.shopsmart.databinding.ActivityMainBinding;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +22,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private DrawerAdapter drawerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +40,16 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // Initialize DrawerAdapter
+        DrawerLayout drawerLayout = binding.drawerLayout;
+        NavigationView navigationView = binding.navigationView;
+
+        if (drawerLayout == null || navigationView == null) {
+            throw new NullPointerException("DrawerLayout or NavigationView is not initialized properly.");
+        }
+
+        drawerAdapter = new DrawerAdapter(this, drawerLayout, navigationView);
+
         // Set up initial fragment
         replaceFragment(new HomeFragment());
 
@@ -45,12 +60,13 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new FavouriteFragment());
                     return true;
                 case R.id.more:
-                    replaceFragment(new MenuFragment());
+                    drawerLayout.openDrawer(GravityCompat.END); // Open the drawer when "more" is clicked
                     return true;
                 default:
                     return false;
             }
         });
+
 
         // Set up the bottom navigation menu
         setupBottomNavigationView();
@@ -72,10 +88,12 @@ public class MainActivity extends AppCompatActivity {
         for (BottomTabItemType tab : bottomTabList) {
             switch (tab) {
                 case FAVOURITE:
-                    binding.bottomNavigationView.getMenu().add(0, R.id.favourite, 0, "Favourite").setIcon(R.drawable.img_home_bottom_tab_favorite);
+                    binding.bottomNavigationView.getMenu().add(0, R.id.favourite, 0, "Favourite")
+                            .setIcon(R.drawable.img_home_bottom_tab_favorite);
                     break;
                 case MORE:
-                    binding.bottomNavigationView.getMenu().add(0, R.id.more, 1, "More").setIcon(R.drawable.img_home_bottom_tab_more);
+                    binding.bottomNavigationView.getMenu().add(0, R.id.more, 1, "More")
+                            .setIcon(R.drawable.img_home_bottom_tab_more);
                     break;
                 // Add cases for other tabs as needed
             }

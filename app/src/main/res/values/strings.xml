@@ -2,4 +2,12 @@
     <string name="app_name">ShopSmart</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Home fragment</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_home_title">HOME</string>
+    <string name="nav_enter_code_title">ENTER CODE</string>
+    <string name="nav_location_title">LOCATIONS</string>
+    <string name="nav_setting_title">SETTINGS</string>
+    <string name="profile_title">HELLO</string>
+
 </resources>

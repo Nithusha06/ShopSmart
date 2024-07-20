@@ -12,22 +12,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ShopSmart"
         tools:targetApi="31">
+
+        <!-- Register activities within the application -->
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
+
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
+
+        <!-- MainActivity is the entry point of your application -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
-
 
 </manifest>
