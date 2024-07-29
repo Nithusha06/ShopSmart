@@ -11,24 +11,46 @@ import com.example.shopsmart.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import androidx.core.view.GravityCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import androidx.core.view.GravityCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CAMERA_PERMISSION = 200;
     private ActivityMainBinding binding;
     private DrawerAdapter drawerAdapter;
+    private ImageUpload imageUpload;
+    private ImageView profileImageView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Request camera permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
+        }
 
         // Initialize Firebase Auth
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -50,6 +72,11 @@ public class MainActivity extends AppCompatActivity {
 
         drawerAdapter = new DrawerAdapter(this, drawerLayout, navigationView);
 
+        // Initialize ImageUpload
+        profileImageView = binding.navigationView.getHeaderView(0).findViewById(R.id.profile_image);
+        imageUpload = new ImageUpload(this, profileImageView);
+        profileImageView.setOnClickListener(view -> showImageChoiceDialog());
+
         // Set up initial fragment
         replaceFragment(new HomeFragment());
 
@@ -67,9 +94,53 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         // Set up the bottom navigation menu
         setupBottomNavigationView();
+    }
+
+    private void showImageChoiceDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.image_upload, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        Button chooseGallery = dialogView.findViewById(R.id.button_choose_gallery);
+        Button useCamera = dialogView.findViewById(R.id.button_use_camera);
+        Button cancel = dialogView.findViewById(R.id.button_cancel);
+
+        chooseGallery.setOnClickListener(v -> {
+            imageUpload.chooseImageFromGallery();
+            dialog.dismiss();
+        });
+
+        useCamera.setOnClickListener(v -> {
+            imageUpload.captureImageFromCamera();
+            dialog.dismiss();
+        });
+
+        cancel.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        imageUpload.handleImageResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permissions granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Camera and storage permissions are required to use this feature", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void replaceFragment(Fragment fragment) {

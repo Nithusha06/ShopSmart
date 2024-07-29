@@ -12,6 +12,7 @@
     <color name="drawer_icon_color">#FF00FF</color>
     <color name="drawer_text_color">#FF00FF</color>
     <color name="profile_text_color">#FF00FF</color>
-
+    <color name="button_normal_color">#FFFF80D5</color>
+    <color name="button_pressed_color">#FFFF80D5</color>
 
 </resources>
