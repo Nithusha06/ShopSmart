@@ -7,9 +7,9 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.ImageView;
-
-import androidx.core.content.FileProvider; // Import FileProvider
-
+import androidx.core.content.FileProvider;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -48,10 +48,9 @@ public class ImageUpload {
             }
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(activity,
-                        "com.example.shopsmart.fileprovider", // Replace with your application's file provider authority
+                        "com.example.shopsmart.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                // Grant temporary read/write permission to the content URI
                 takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 activity.startActivityForResult(takePictureIntent, CAMERA_REQUEST);
@@ -75,29 +74,18 @@ public class ImageUpload {
     public void handleImageResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
             Uri uri = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), uri);
-                profileImageView.setImageBitmap(bitmap);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                // Show an error message to the user
-            } catch (IOException e) {
-                e.printStackTrace();
-                // Show an error message to the user
-            }
+            Picasso.get()
+                    .load(uri)
+                    .transform(new CircleTransform())  // Apply circular crop
+                    .into(profileImageView);
         } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             File imgFile = new File(currentPhotoPath);
             if (imgFile.exists()) {
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), Uri.fromFile(imgFile));
-                    profileImageView.setImageBitmap(bitmap);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    // Show an error message to the user
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    // Show an error message to the user
-                }
+                Uri uri = Uri.fromFile(imgFile);
+                Picasso.get()
+                        .load(uri)
+                        .transform(new CircleTransform())  // Apply circular crop
+                        .into(profileImageView);
             }
         }
     }

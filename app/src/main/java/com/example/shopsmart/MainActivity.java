@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageUpload imageUpload;
     private ImageView profileImageView;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         setupBottomNavigationView();
     }
 
+    // Method to show a dialog for choosing between gallery and camera
     private void showImageChoiceDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -125,12 +125,14 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    // Handle the result of image selection or capture
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         imageUpload.handleImageResult(requestCode, resultCode, data);
     }
 
+    // Handle permission request results
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -143,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Replace the current fragment with the given fragment
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -151,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
+    // Set up the bottom navigation menu with dynamic items
     private void setupBottomNavigationView() {
         // Clear existing menu items
         binding.bottomNavigationView.getMenu().clear();
@@ -171,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Return the list of bottom navigation items
     public List<BottomTabItemType> getBottomTabItemTypes() {
         List<BottomTabItemType> bottomTabList = new ArrayList<>();
         bottomTabList.add(BottomTabItemType.FAVOURITE);
@@ -179,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
         return bottomTabList;
     }
 
+    // Handle back button press to navigate back in the fragment stack
     @Override
     public void onBackPressed() {
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
