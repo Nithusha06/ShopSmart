@@ -1,17 +1,16 @@
 package com.example.shopsmart;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 import androidx.core.content.FileProvider;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Transformation;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,6 +19,8 @@ public class ImageUpload {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int CAMERA_REQUEST = 2;
+    private static final String PREFS_NAME = "ImageUploadPrefs";
+    private static final String IMAGE_URI_KEY = "imageUri";
 
     private Activity activity;
     private ImageView profileImageView;
@@ -28,6 +29,7 @@ public class ImageUpload {
     public ImageUpload(Activity activity, ImageView profileImageView) {
         this.activity = activity;
         this.profileImageView = profileImageView;
+        loadSavedImage();  // Load saved image when the activity is initialized
     }
 
     public void chooseImageFromGallery() {
@@ -78,6 +80,7 @@ public class ImageUpload {
                     .load(uri)
                     .transform(new CircleTransform())  // Apply circular crop
                     .into(profileImageView);
+            saveImageUri(uri.toString());  // Save the selected image URI
         } else if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             File imgFile = new File(currentPhotoPath);
             if (imgFile.exists()) {
@@ -86,7 +89,26 @@ public class ImageUpload {
                         .load(uri)
                         .transform(new CircleTransform())  // Apply circular crop
                         .into(profileImageView);
+                saveImageUri(uri.toString());  // Save the captured image URI
             }
+        }
+    }
+
+    private void saveImageUri(String uri) {
+        SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(IMAGE_URI_KEY, uri);
+        editor.apply();
+    }
+
+    private void loadSavedImage() {
+        SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String savedUri = prefs.getString(IMAGE_URI_KEY, null);
+        if (savedUri != null) {
+            Picasso.get()
+                    .load(Uri.parse(savedUri))
+                    .transform(new CircleTransform())  // Apply circular crop
+                    .into(profileImageView);
         }
     }
 }
